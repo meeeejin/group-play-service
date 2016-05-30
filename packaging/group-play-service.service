@@ -1,0 +1,10 @@
+[Unit]
+Description=Start the group play service
+After=bluetooth.service
+
+[Service]
+ExecStart=/usr/bin/group-play-service-svc
+Type=oneshot
+
+[Install]
+WantedBy=graphical.target
