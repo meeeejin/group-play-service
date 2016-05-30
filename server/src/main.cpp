@@ -8,7 +8,7 @@
 #include <glib.h>
 
 #undef LOG_TAG
-#define LOG_TAG "HELLO_TIZEN_SVC"
+#define LOG_TAG "GROUP_PLAY_SVC"
 
 static GMainLoop* gMainLoop = NULL;
 gboolean timeout_func_cb(gpointer data)

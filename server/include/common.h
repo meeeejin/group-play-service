@@ -14,19 +14,19 @@ extern "C"
 #endif
 
 
-enum hts_log_type {
-	HELLO_LOG_PRINT_FILE		= 1,
-	HELLO_LOG_SYSLOG			= 2,
-	HELLO_LOG_DLOG			= 3,
+enum gps_log_type {
+	GPS_LOG_PRINT_FILE		= 1,
+	GPS_LOG_SYSLOG			= 2,
+	GPS_LOG_DLOG			= 3,
 };
 
-enum hts_priority_type {
-	HELLO_LOG_ERR			= 1,
-	HELLO_LOG_DBG			= 2,
-	HELLO_LOG_INFO		= 3,
+enum gps_priority_type {
+	GPS_LOG_ERR			= 1,
+	GPS_LOG_DBG			= 2,
+	GPS_LOG_INFO		= 3,
 };
 
-void hts_log(int type , int priority , const char *tag , const char *fmt , ...);
+void gps_log(int type , int priority , const char *tag , const char *fmt , ...);
 
 
 #define MICROSECONDS(tv)        ((tv.tv_sec * 1000000ll) + tv.tv_usec)
@@ -40,45 +40,45 @@ void hts_log(int type , int priority , const char *tag , const char *fmt , ...);
 #ifdef LOG_TAG
 	#undef LOG_TAG
 #endif
-#define LOG_TAG	"HELLO_TIZEN_SVC"
+#define LOG_TAG	"GROUP_PLAY_SVC"
 //
 
 
 #if defined(_DEBUG) || defined(USE_FILE_DEBUG) 
 
-#define DbgPrint(fmt, arg...)   do { hts_log(HELLO_LOG_PRINT_FILE, 0, LOG_TAG , "[HELLO_MSG_PRT][%s:%d] "fmt"\n",__MODULE__, __LINE__, ##arg); } while(0)
+#define DbgPrint(fmt, arg...)   do { gps_log(GPS_LOG_PRINT_FILE, 0, LOG_TAG , "[GPS_MSG_PRT][%s:%d] "fmt"\n",__MODULE__, __LINE__, ##arg); } while(0)
 
 #endif
 
 #if defined(USE_SYSLOG_DEBUG)
 
-#define ERR(fmt, arg...) do { hts_log(HELLO_LOG_SYSLOG, HELLO_LOG_ERR, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg); } while(0)
-#define INFO(fmt, arg...) do { hts_log(HELLO_LOG_SYSLOG, HELLO_LOG_INFO, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg); } while(0)
-#define DBG(fmt, arg...) do { hts_log(HELLO_LOG_SYSLOG, HELLO_LOG_DBG, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg); } while(0)
+#define ERR(fmt, arg...) do { gps_log(GPS_LOG_SYSLOG, GPS_LOG_ERR, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg); } while(0)
+#define INFO(fmt, arg...) do { gps_log(GPS_LOG_SYSLOG, GPS_LOG_INFO, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg); } while(0)
+#define DBG(fmt, arg...) do { gps_log(GPS_LOG_SYSLOG, GPS_LOG_DBG, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg); } while(0)
 
 
 #elif defined(_DEBUG) || defined(USE_DLOG_DEBUG)
 
-#define ERR(fmt, arg...) do { hts_log(HELLO_LOG_DLOG, HELLO_LOG_ERR, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg); } while(0)
-#define INFO(fmt, arg...) do { hts_log(HELLO_LOG_DLOG, HELLO_LOG_INFO, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg); } while(0)
-#define DBG(fmt, arg...) do { hts_log(HELLO_LOG_DLOG, HELLO_LOG_DBG, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg); } while(0)
+#define ERR(fmt, arg...) do { gps_log(GPS_LOG_DLOG, GPS_LOG_ERR, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg); } while(0)
+#define INFO(fmt, arg...) do { gps_log(GPS_LOG_DLOG, GPS_LOG_INFO, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg); } while(0)
+#define DBG(fmt, arg...) do { gps_log(GPS_LOG_DLOG, GPS_LOG_DBG, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg); } while(0)
 
 #elif defined(USE_FILE_DEBUG) 
 
-#define ERR(fmt, arg...)	do { hts_log(HELLO_LOG_PRINT_FILE, 0, LOG_TAG ,"[HELLO_MSG_ERR][%s:%d] "fmt"\n",__MODULE__, __LINE__, ##arg); } while(0)
-#define DBG(fmt, arg...)	do { hts_log(HELLO_LOG_PRINT_FILE, 0, LOG_TAG ,"[HELLO_MSG_DBG][%s:%d] "fmt"\n",__MODULE__, __LINE__, ##arg); } while(0)
-#define INFO(fmt, arg...)	do { hts_log(HELLO_LOG_PRINT_FILE, 0, LOG_TAG ,"[HELLO_MSG_INFO][%s:%d] "fmt"\n",__MODULE__, __LINE__, ##arg); } while(0)
+#define ERR(fmt, arg...)	do { gps_log(GPS_LOG_PRINT_FILE, 0, LOG_TAG ,"[GPS_MSG_ERR][%s:%d] "fmt"\n",__MODULE__, __LINE__, ##arg); } while(0)
+#define DBG(fmt, arg...)	do { gps_log(GPS_LOG_PRINT_FILE, 0, LOG_TAG ,"[GPS_MSG_DBG][%s:%d] "fmt"\n",__MODULE__, __LINE__, ##arg); } while(0)
+#define INFO(fmt, arg...)	do { gps_log(GPS_LOG_PRINT_FILE, 0, LOG_TAG ,"[GPS_MSG_INFO][%s:%d] "fmt"\n",__MODULE__, __LINE__, ##arg); } while(0)
 
 #elif defined(USE_DLOG_DEBUG) 
 
-#define ERR(fmt, arg...) do { hts_log(HELLO_LOG_DLOG, HELLO_LOG_ERR, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg); } while(0)
-#define INFO(fmt, arg...) do { hts_log(HELLO_LOG_DLOG, HELLO_LOG_INFO, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg); } while(0)
+#define ERR(fmt, arg...) do { gps_log(GPS_LOG_DLOG, GPS_LOG_ERR, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg); } while(0)
+#define INFO(fmt, arg...) do { gps_log(GPS_LOG_DLOG, GPS_LOG_INFO, LOG_TAG, "%s:%s(%d)> "fmt, __MODULE__, __func__, __LINE__, ##arg); } while(0)
 
 #define DBG(...)
 #define DbgPrint(...)
 
 #else
-#define ERR(fmt, arg...) do { hts_log(HELLO_LOG_DLOG, HELLO_LOG_ERR, LOG_TAG, fmt , ##arg); } while(0)
+#define ERR(fmt, arg...) do { gps_log(GPS_LOG_DLOG, GPS_LOG_ERR, LOG_TAG, fmt , ##arg); } while(0)
 						
 #define DbgPrint(...)
 #define DBG(...)
