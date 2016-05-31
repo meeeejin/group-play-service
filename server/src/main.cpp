@@ -27,8 +27,9 @@ int main(int argc, char *argv[])
 
 	// Initialize a GTK main loop
 	gMainLoop = g_main_loop_new(NULL, FALSE);
-	ERR("HELLO Sevice started\n");
-	printf("PHELLO Sevice started\n");
+	//ERR("HELLO Sevice started\n");
+    dlog_print(DLOG_INFO, "mijin", "Group Play Sevice started.");
+	//printf("PHELLO Sevice started\n");
 
 	// Add callbacks to main loop
 	g_timeout_add(3, timeout_func_cb, gMainLoop); // Timeout callback: it will be called after 3000ms.
@@ -36,8 +37,9 @@ int main(int argc, char *argv[])
 	// Start the main loop of service
 	g_main_loop_run(gMainLoop);
 
-	ERR("HELLO Serice is terminated successfully\n");
-	printf("PHELLO Serice is terminated successfully\n");
+	//ERR("HELLO Serice is terminated successfully\n");
+    dlog_print(DLOG_INFO, "mijin", "Group Play Sevice terminated.");
+    //printf("PHELLO Serice is terminated successfully\n");
 
 	return ret;
 }
