@@ -13,7 +13,6 @@ Source1:    group-play-service.service
 BuildRequires:  cmake
 BuildRequires:  libattr-devel
 BuildRequires:  pkgconfig(glib-2.0)
-BuildRequires:  pkgconfig(dlog)
 BuildRequires:  pkgconfig(capi-system-info)
 BuildRequires:  pkgconfig(capi-network-wifi)
 BuildRequires:  pkgconfig(dlog)
@@ -25,7 +24,7 @@ BuildRequires:  pkgconfig(ecore-x)
 BuildRequires:  pkgconfig(ecore-evas)
 BuildRequires:  pkgconfig(capi-appfw-app-manager)
 BuildRequires:  pkgconfig(capi-appfw-application)
-#BuildRequires:  pkgconfig(osp-appfw)
+BuildRequires:  pkgconfig(osp-appfw)
 
 ## Description string that this package's human users can understand
 %description
@@ -58,6 +57,9 @@ mkdir -p %{buildroot}%{_libdir}/systemd/system/graphical.target.wants
 install -m 0644 %SOURCE1 %{buildroot}%{_libdir}/systemd/system/
 ln -s ../group-play-service.service %{buildroot}%{_libdir}/systemd/system/graphical.target.wants/group-play-service.service
 
+#mkdir -p %{buildroot}/opt/etc/smack/accesses.d
+#install -m 644 group-play-service.rule %{buildroot}/opt/etc/smack/accesses.d
+
 ## Postprocess script
 %post 
 
@@ -68,3 +70,4 @@ ln -s ../group-play-service.service %{buildroot}%{_libdir}/systemd/system/graphi
 %{_libdir}/systemd/system/group-play-service.service
 %{_libdir}/systemd/system/graphical.target.wants/group-play-service.service
 /usr/share/license/%{name}
+#/opt/etc/smack/accesses.d/group-play-service.rule

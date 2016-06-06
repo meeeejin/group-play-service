@@ -2,11 +2,6 @@
 #if !defined(_COMMON_H_)
 #define _COMMON_H_
 
-// Log methods
-// USE_DLOG_DEBUG: You can check logs by running 'dlogutil'
-// USE_SYSLOG_DEBUG: You can check logs by reading '/var/log/messages'
-// USE_FILE_DEBUG: You can check logs by reading '/var/log/messages'
-#define USE_DLOG_DEBUG
 
 #ifdef __cplusplus
 extern "C"

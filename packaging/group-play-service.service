@@ -4,6 +4,7 @@ After=net-config.service
 
 [Service]
 ExecStart=/usr/bin/group-play-svc
+#Type=oneshot
 Restart=always
 RestartSec=3
 

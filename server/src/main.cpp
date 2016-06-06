@@ -1,13 +1,16 @@
+#include <glib.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <iostream>
+#include <vconf.h>
 
 #include "common.h"
 #include <dlog.h>
-#include <glib.h>
+#include <Ecore.h>
+#include <Ecore_X.h>
+#include <Ecore_Evas.h>
 
-#include <vconf.h>
 #include <wifi.h>
 #include <netdb.h>
 #include <sys/socket.h>
@@ -48,61 +51,6 @@ void _vconf_noti_callback(keynode_t *node, void* data)
     }
 }
 
-/*Eina_Bool mp_app_mouse_event_cb(void *data, int type, void *event)
-{
-    printf("TEST\n");
-        if (type == ECORE_EVENT_MOUSE_BUTTON_DOWN) {
-                printf("ECORE_EVENT_MOUSE_BUTTON_DOWN\n");
-                    }
-                        else if (type == ECORE_EVENT_MOUSE_BUTTON_UP) {
-                                printf("ECORE_EVENT_MOUSE_BUTTON_UP\n");
-                                    }
-
-                                        return 0;
-                                        }
-
-                                        bool initEcore()
-                                        {
-                                            printf("initEcore()\n");
-
-                                                int ret, type;
-                                                    Eina_Bool did = EINA_FALSE;
-                                                        Ecore_Event_Handler *mouse_down = NULL;
-                                                            Ecore_Event_Handler *handler = NULL;
-                                                                Ecore_Event *event;
-
-                                                                    ret = ecore_init();
-                                                                        if (ret != 1)
-                                                                                printf("ecore_init fail\n");
-
-                                                                                    ecore_event_init();
-                                                                                        type = ecore_event_type_new();
-                                                                                            if (type < 1) 
-                                                                                                    printf("type fail\n");
-
-                                                                                                        handler = ecore_event_handler_add(type, mp_app_mouse_event_cb, &did);
-                                                                                                            if (!handler) 
-                                                                                                                    printf("Regi fail 1\n");
-
-                                                                                                                        event = ecore_event_add(type, NULL, NULL, NULL);
-                                                                                                                            if (!event)
-                                                                                                                                    printf("add fail\n");
-
-
-                                                                                                                                        mouse_down = ecore_event_handler_add(ECORE_EVENT_MOUSE_BUTTON_DOWN, mp_app_mouse_event_cb, NULL);
-                                                                                                                                            if (!mouse_down)
-                                                                                                                                                    printf("Regi fail 2\n");
-
-                                                                                                                                                        printf("%d %d\n", type, ECORE_EVENT_MOUSE_BUTTON_DOWN);
-
-                                                                                                                                                            printf("main_loop_bengin()\n");
-                                                                                                                                                                ecore_main_loop_begin();
-
-                                                                                                                                                                    ret = ecore_shutdown();
-                                                                                                                                                                        printf("unreached main_loop_bengin()\n");
-                                                                                                                                                                        }
-
-*/
 bool init_vconf()
 {
     bool res = TRUE;

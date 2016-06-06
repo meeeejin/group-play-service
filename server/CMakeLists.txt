@@ -5,19 +5,20 @@ project(group-play-svc CXX)
 # PKG_SEARCH_MODULE: used to check for given modules and uses the first working one
 INCLUDE(FindPkgConfig)
 PKG_CHECK_MODULES(rpkgs-dlog REQUIRED dlog)
-PKG_CHECK_MODULES(rpkgs-glib REQUIRED glib-2.0)
 PKG_CHECK_MODULES(rpkgs-aul REQUIRED aul)
 PKG_CHECK_MODULES(rpkgs-capi REQUIRED capi-system-info capi-appfw-app-manager capi-network-wifi capi-appfw-application)
+PKG_CHECK_MODULES(rpkgs-glib REQUIRED glib-2.0)
+PKG_CHECK_MODULES(rpkgs REQUIRED vconf heynoti osp-appfw)
 PKG_CHECK_MODULES(rpkgs-ecore REQUIRED ecore ecore-x ecore-evas ecore-input)
-PKG_CHECK_MODULES(rpkgs REQUIRED vconf heynoti)
+
 
 # Add CFLAGS used for required modules
 ADD_DEFINITIONS(${rpkgs-dlog_CFLAGS})
-ADD_DEFINITIONS(${rpkgs-glib_CFLAGS})
 ADD_DEFINITIONS(${rpkgs-aul_CFLAGS})
-ADD_DEFINITIONS(${rpkgs-ecore_CFLAGS})
-ADD_DEFINITIONS(${rpkgs_CFLAGS})
 ADD_DEFINITIONS(${rpkgs-capi_CFLAGS})
+ADD_DEFINITIONS(${rpkgs-ecore_CFLAGS})
+ADD_DEFINITIONS(${rpkgs-glib_CFLAGS})
+ADD_DEFINITIONS(${rpkgs_CFLAGS})
 
 # Set include directories
 INCLUDE_DIRECTORIES(
