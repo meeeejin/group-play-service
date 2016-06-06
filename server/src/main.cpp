@@ -22,7 +22,7 @@
 
 #include <pthread.h>
 //#include <FBase.h> 
-#include <FApp.h>
+//#include <FApp.h>
 
 #include <aul.h>
 #include <app_manager.h>
@@ -48,7 +48,7 @@ void _vconf_noti_callback(keynode_t *node, void* data)
     }
 }
 
-Eina_Bool mp_app_mouse_event_cb(void *data, int type, void *event)
+/*Eina_Bool mp_app_mouse_event_cb(void *data, int type, void *event)
 {
     printf("TEST\n");
         if (type == ECORE_EVENT_MOUSE_BUTTON_DOWN) {
@@ -102,7 +102,7 @@ Eina_Bool mp_app_mouse_event_cb(void *data, int type, void *event)
                                                                                                                                                                         printf("unreached main_loop_bengin()\n");
                                                                                                                                                                         }
 
-
+*/
 bool init_vconf()
 {
     bool res = TRUE;
@@ -158,7 +158,7 @@ int main(int argc, char *argv[])
     init_vconf();
 
     // Initialize Ecore
-    initEcore();
+    //initEcore();
 
 	// Start the main loop of service
 	g_main_loop_run(gMainLoop);
