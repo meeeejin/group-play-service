@@ -7,18 +7,140 @@
 #include <dlog.h>
 #include <glib.h>
 
+#include <vconf.h>
+#include <wifi.h>
+#include <netdb.h>
+#include <sys/socket.h>
+#include <sys/ioctl.h>
+#include <sys/un.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <assert.h>
+#include <tizen_error.h>
+
+#include "udp_test.h"
+
+#include <pthread.h>
+//#include <FBase.h> 
+#include <FApp.h>
+
+#include <aul.h>
+#include <app_manager.h>
+
 #undef LOG_TAG
 #define LOG_TAG "GROUP_PLAY_SVC"
 
+#define VCONFKEY_GROUP_PLAY  "db/private/org.tizen.menu-screen/group_play"
+#define MUSIC_PLAYER_PKG_NAME "org.tizen.music-player"
+
 static GMainLoop* gMainLoop = NULL;
-gboolean timeout_func_cb(gpointer data)
+
+void _vconf_noti_callback(keynode_t *node, void* data)
 {
-	if(gMainLoop)
-	{
-		ALOGD("Main loop will be terminated.");
-		g_main_loop_quit((GMainLoop*)data);
-	}
-	return FALSE;
+    printf("%s:+++\n", __func__);
+
+//    struct appdata *ad = (struct appdata *)data;
+    char *keyname = vconf_keynode_get_name(node);
+
+    if (strcmp(keyname, VCONFKEY_GROUP_PLAY) == 0)
+    {
+        msg_send_func(PLAY_TIME_REQ);
+    }
+}
+
+Eina_Bool mp_app_mouse_event_cb(void *data, int type, void *event)
+{
+    printf("TEST\n");
+        if (type == ECORE_EVENT_MOUSE_BUTTON_DOWN) {
+                printf("ECORE_EVENT_MOUSE_BUTTON_DOWN\n");
+                    }
+                        else if (type == ECORE_EVENT_MOUSE_BUTTON_UP) {
+                                printf("ECORE_EVENT_MOUSE_BUTTON_UP\n");
+                                    }
+
+                                        return 0;
+                                        }
+
+                                        bool initEcore()
+                                        {
+                                            printf("initEcore()\n");
+
+                                                int ret, type;
+                                                    Eina_Bool did = EINA_FALSE;
+                                                        Ecore_Event_Handler *mouse_down = NULL;
+                                                            Ecore_Event_Handler *handler = NULL;
+                                                                Ecore_Event *event;
+
+                                                                    ret = ecore_init();
+                                                                        if (ret != 1)
+                                                                                printf("ecore_init fail\n");
+
+                                                                                    ecore_event_init();
+                                                                                        type = ecore_event_type_new();
+                                                                                            if (type < 1) 
+                                                                                                    printf("type fail\n");
+
+                                                                                                        handler = ecore_event_handler_add(type, mp_app_mouse_event_cb, &did);
+                                                                                                            if (!handler) 
+                                                                                                                    printf("Regi fail 1\n");
+
+                                                                                                                        event = ecore_event_add(type, NULL, NULL, NULL);
+                                                                                                                            if (!event)
+                                                                                                                                    printf("add fail\n");
+
+
+                                                                                                                                        mouse_down = ecore_event_handler_add(ECORE_EVENT_MOUSE_BUTTON_DOWN, mp_app_mouse_event_cb, NULL);
+                                                                                                                                            if (!mouse_down)
+                                                                                                                                                    printf("Regi fail 2\n");
+
+                                                                                                                                                        printf("%d %d\n", type, ECORE_EVENT_MOUSE_BUTTON_DOWN);
+
+                                                                                                                                                            printf("main_loop_bengin()\n");
+                                                                                                                                                                ecore_main_loop_begin();
+
+                                                                                                                                                                    ret = ecore_shutdown();
+                                                                                                                                                                        printf("unreached main_loop_bengin()\n");
+                                                                                                                                                                        }
+
+
+bool init_vconf()
+{
+    bool res = TRUE;
+
+    printf("%s:+++\n", __func__);
+
+    if (vconf_notify_key_changed(VCONFKEY_GROUP_PLAY, _vconf_noti_callback, NULL) < 0)
+    {
+            printf("Error when register callback\n");
+            res = FALSE;
+    }
+
+    printf("%s:---:res=%d\n", __func__, res);
+    
+    return res;
+}
+
+bool deinit_vconf()
+{
+    bool res = TRUE;
+        
+    printf("%s:+++\n", __func__);
+                
+    //vconf_ignore_key_changed(VCONF_PLAYER_SHUFFLE, _vconf_noti_callback);
+                        
+    printf("%s:---:res=%d\n", __func__, res);
+                                
+    return res;
+}
+
+void initIPC(void)
+{
+    pthread_attr_t attr;
+    pthread_t thread_t;
+
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+    pthread_create(&thread_t, &attr, &udp_thread_start, NULL);
 }
 
 int main(int argc, char *argv[])
@@ -27,21 +149,25 @@ int main(int argc, char *argv[])
 
 	// Initialize a GTK main loop
 	gMainLoop = g_main_loop_new(NULL, FALSE);
-	//ERR("HELLO Sevice started\n");
-    dlog_print(DLOG_INFO, "mijin", "Group Play Sevice started.");
-	//printf("PHELLO Sevice started\n");
+    //dlog_print(DLOG_INFO, LOG_TAG, "Group Play Sevice started.");
 
-	// Add callbacks to main loop
-	g_timeout_add(3, timeout_func_cb, gMainLoop); // Timeout callback: it will be called after 3000ms.
+    // Initialize a udp communication
+    initIPC();
+
+    // Initialize the vconf file
+    init_vconf();
+
+    // Initialize Ecore
+    initEcore();
 
 	// Start the main loop of service
 	g_main_loop_run(gMainLoop);
 
-	//ERR("HELLO Serice is terminated successfully\n");
-    dlog_print(DLOG_INFO, "mijin", "Group Play Sevice terminated.");
-    //printf("PHELLO Serice is terminated successfully\n");
+    // Deinitializing vconf
+    deinit_vconf();
+
+    //dlog_print(DLOG_INFO, LOG_TAG, "Group Play Sevice terminated.");
 
 	return ret;
 }
 
-//! End of a file

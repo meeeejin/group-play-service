@@ -1,11 +1,11 @@
 [Unit]
 Description=Start the group play service
-After=bluetooth.service
+After=net-config.service
 
 [Service]
 ExecStart=/usr/bin/group-play-svc
 Restart=always
-RestartSec=1
+RestartSec=3
 
 [Install]
 WantedBy=graphical.target
