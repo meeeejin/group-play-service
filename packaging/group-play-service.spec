@@ -57,8 +57,8 @@ mkdir -p %{buildroot}%{_libdir}/systemd/system/graphical.target.wants
 install -m 0644 %SOURCE1 %{buildroot}%{_libdir}/systemd/system/
 ln -s ../group-play-service.service %{buildroot}%{_libdir}/systemd/system/graphical.target.wants/group-play-service.service
 
-#mkdir -p %{buildroot}/opt/etc/smack/accesses.d
-#install -m 644 group-play-service.rule %{buildroot}/opt/etc/smack/accesses.d
+mkdir -p %{buildroot}/opt/etc/smack/accesses.d
+install -m 644 group-play-service.rule %{buildroot}/opt/etc/smack/accesses.d
 
 ## Postprocess script
 %post 
@@ -70,4 +70,4 @@ ln -s ../group-play-service.service %{buildroot}%{_libdir}/systemd/system/graphi
 %{_libdir}/systemd/system/group-play-service.service
 %{_libdir}/systemd/system/graphical.target.wants/group-play-service.service
 /usr/share/license/%{name}
-#/opt/etc/smack/accesses.d/group-play-service.rule
+/opt/etc/smack/accesses.d/group-play-service.rule

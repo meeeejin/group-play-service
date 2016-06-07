@@ -7,6 +7,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <string.h>
 
 #include <wifi.h>
 #include <netdb.h>
@@ -43,9 +44,9 @@ static void playMusic()
     service_set_package(service, SOUND_PLAYER_PKG_NAME);
     service_set_uri(service, "file:///opt/storage/sdcard/Sounds/1.mp3");
     if (service_send_launch_request(service, NULL, NULL) == SERVICE_ERROR_NONE) {
-        printf("Success\n");
+        ALOGI("Success\n");
     } else {
-        printf("Fail\n");
+        ALOGI("Fail\n");
     }
     service_destroy(service);
 }
@@ -55,9 +56,12 @@ int msg_send_func(unsigned int ulMsgId)
     struct stMsg stSendBuf;
     struct sockaddr_in destaddr;
     int addrlen = sizeof(destaddr); 
-    char ip_addr[16] = "192.168.32.132";
+    char ip_addr[16] = {0,};
+    char *temp = "192.168.32.132";
 
-    printf("\n\r Dest Ip Addres is %s \n\r", ip_addr);
+    strcpy(ip_addr, temp);
+
+    ALOGI("\n\r Dest Ip Addres is %s \n\r", ip_addr);
 
     memset(&stSendBuf, 0x0, sizeof(stSendBuf));
 
@@ -131,8 +135,8 @@ void *udp_thread_start(void*)
         {
             stUdpMsg = (struct stMsg *)RecvBuf;
 
-            printf("\n\r");
-            printf("Message ID : 0x%08X \n\r", ntohl(stUdpMsg->ulMsgId));
+            ALOGI("\n\r");
+            ALOGI("Message ID : 0x%08X \n\r", ntohl(stUdpMsg->ulMsgId));
 
             switch(ntohl(stUdpMsg->ulMsgId))
             {

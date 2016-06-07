@@ -24,8 +24,8 @@
 #include "udp_test.h"
 
 #include <pthread.h>
-//#include <FBase.h> 
-//#include <FApp.h>
+#include <FBase.h> 
+#include <FApp.h>
 
 #include <aul.h>
 #include <app_manager.h>
@@ -37,15 +37,11 @@
 #define MUSIC_PLAYER_PKG_NAME "org.tizen.music-player"
 
 static GMainLoop* gMainLoop = NULL;
-static int gSocketFd = -1;
-static const char uuid[] = "00001101-0000-1000-8000-00805F9B34FB";
-
 
 void _vconf_noti_callback(keynode_t *node, void* data)
 {
-    printf("%s:+++\n", __func__);
+    ALOGI("%s:+++\n", __func__);
 
-//    struct appdata *ad = (struct appdata *)data;
     char *keyname = vconf_keynode_get_name(node);
 
     if (strcmp(keyname, VCONFKEY_GROUP_PLAY) == 0)
@@ -54,9 +50,22 @@ void _vconf_noti_callback(keynode_t *node, void* data)
     }
 }
 
+Eina_Bool mp_app_mouse_event_cb(void *data, int type, void *event)
+{
+    ALOGI("TEST\n");
+    if (type == ECORE_EVENT_MOUSE_BUTTON_DOWN) {
+        ALOGI("ECORE_EVENT_MOUSE_BUTTON_DOWN\n");
+    }
+    else if (type == ECORE_EVENT_MOUSE_BUTTON_UP) {
+        ALOGI("ECORE_EVENT_MOUSE_BUTTON_UP\n");
+    }
+
+    return 0;
+}
+
 bool initEcore()
 {
-    printf("initEcore()\n");
+    ALOGI("initEcore()\n");
 
     int ret, type;
     Eina_Bool did = EINA_FALSE;
@@ -66,48 +75,48 @@ bool initEcore()
 
     ret = ecore_init();
     if (ret != 1)
-        printf("ecore_init fail\n");
+        ALOGI("ecore_init fail\n");
 
     ecore_event_init();
     type = ecore_event_type_new();
     if (type < 1) 
-        printf("type fail\n");
+        ALOGI("type fail\n");
 
     handler = ecore_event_handler_add(type, mp_app_mouse_event_cb, &did);
     if (!handler) 
-        printf("Regi fail 1\n");
+        ALOGI("Regi fail 1\n");
 
     event = ecore_event_add(type, NULL, NULL, NULL);
     if (!event)
-        printf("add fail\n");
+        ALOGI("add fail\n");
 
 
     mouse_down = ecore_event_handler_add(ECORE_EVENT_MOUSE_BUTTON_DOWN, mp_app_mouse_event_cb, NULL);
     if (!mouse_down)
-        printf("Regi fail 2\n");
+        ALOGI("Regi fail 2\n");
 
-    printf("%d %d\n", type, ECORE_EVENT_MOUSE_BUTTON_DOWN);
+    ALOGI("%d %d\n", type, ECORE_EVENT_MOUSE_BUTTON_DOWN);
 
-    printf("main_loop_bengin()\n");
+    ALOGI("main_loop_bengin()\n");
     ecore_main_loop_begin();
 
     ret = ecore_shutdown();
-    printf("unreached main_loop_bengin()\n");
+    ALOGI("unreached main_loop_bengin()\n");
 }
 
 bool init_vconf()
 {
     bool res = TRUE;
 
-    printf("%s:+++\n", __func__);
+    ALOGI("%s:+++\n", __func__);
 
     if (vconf_notify_key_changed(VCONFKEY_GROUP_PLAY, _vconf_noti_callback, NULL) < 0)
     {
-            printf("Error when register callback\n");
+            ALOGI("Error when register callback\n");
             res = FALSE;
     }
 
-    printf("%s:---:res=%d\n", __func__, res);
+    ALOGI("%s:---:res=%d\n", __func__, res);
     
     return res;
 }
@@ -116,11 +125,11 @@ bool deinit_vconf()
 {
     bool res = TRUE;
         
-    printf("%s:+++\n", __func__);
+    ALOGI("%s:+++\n", __func__);
                 
     //vconf_ignore_key_changed(VCONF_PLAYER_SHUFFLE, _vconf_noti_callback);
                         
-    printf("%s:---:res=%d\n", __func__, res);
+    ALOGI("%s:---:res=%d\n", __func__, res);
                                 
     return res;
 }
@@ -143,7 +152,7 @@ int main(int argc, char *argv[])
 
 	// Initialize a GTK main loop
 	gMainLoop = g_main_loop_new(NULL, FALSE);
-    //dlog_print(DLOG_INFO, LOG_TAG, "Group Play Sevice started.");
+    ALOGI("Group Play Sevice started.");
 
     // Initialize a udp communication
     initIPC();
@@ -159,8 +168,7 @@ int main(int argc, char *argv[])
 
     // Deinitializing vconf
     deinit_vconf();
-
-    //dlog_print(DLOG_INFO, LOG_TAG, "Group Play Sevice terminated.");
+    ALOGI("Group Play Sevice terminated.");
 
 	return ret;
 }
