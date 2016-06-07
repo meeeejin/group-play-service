@@ -1,5 +1,5 @@
 # Group Play Service
-Group Play Service Example
+Group play service for Tizen (SKKU Tizen Project)
 
 ## Prerequisites
 
