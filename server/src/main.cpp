@@ -96,11 +96,11 @@ bool initEcore()
 
     ALOGI("%d %d\n", type, ECORE_EVENT_MOUSE_BUTTON_DOWN);
 
-    ALOGI("main_loop_bengin()\n");
+    ALOGI("main_loop_begin()\n");
     ecore_main_loop_begin();
 
     ret = ecore_shutdown();
-    ALOGI("unreached main_loop_bengin()\n");
+    ALOGI("unreached main_loop_begin()\n");
 }
 
 bool init_vconf()

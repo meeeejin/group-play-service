@@ -29,7 +29,7 @@
 #undef LOG_TAG
 #define LOG_TAG "GROUP_PLAY_SVC"
 
-#define UDP_PORT    8000
+#define UDP_PORT    10122
 #define MAXLINE     1024
 
 #define SOUND_PLAYER_PKG_NAME "org.tizen.sound-player"
@@ -57,7 +57,7 @@ int msg_send_func(unsigned int ulMsgId)
     struct sockaddr_in destaddr;
     int addrlen = sizeof(destaddr); 
     char ip_addr[16] = {0,};
-    char *temp = "192.168.32.132";
+    char *temp = "115.145.173.197";
 
     strcpy(ip_addr, temp);
 
@@ -127,7 +127,7 @@ void *udp_thread_start(void*)
 
     while(1)
     {
-        //dlog_print(DLOG_INFO, LOG_TAG, "\n\rWaiting...\n\r");
+        ALOGI("\n\rWaiting...\n\r");
        
         memset(RecvBuf, 0, sizeof(RecvBuf));
         nbyte = recvfrom(socket_fd, RecvBuf, MAXLINE , 0, (struct sockaddr *)&cliaddr, (socklen_t *)&addrlen);
