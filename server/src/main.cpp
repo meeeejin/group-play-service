@@ -37,6 +37,9 @@
 #define MUSIC_PLAYER_PKG_NAME "org.tizen.music-player"
 
 static GMainLoop* gMainLoop = NULL;
+static int gSocketFd = -1;
+static const char uuid[] = "00001101-0000-1000-8000-00805F9B34FB";
+
 
 void _vconf_noti_callback(keynode_t *node, void* data)
 {
@@ -49,6 +52,47 @@ void _vconf_noti_callback(keynode_t *node, void* data)
     {
         msg_send_func(PLAY_TIME_REQ);
     }
+}
+
+bool initEcore()
+{
+    printf("initEcore()\n");
+
+    int ret, type;
+    Eina_Bool did = EINA_FALSE;
+    Ecore_Event_Handler *mouse_down = NULL;
+    Ecore_Event_Handler *handler = NULL;
+    Ecore_Event *event;
+
+    ret = ecore_init();
+    if (ret != 1)
+        printf("ecore_init fail\n");
+
+    ecore_event_init();
+    type = ecore_event_type_new();
+    if (type < 1) 
+        printf("type fail\n");
+
+    handler = ecore_event_handler_add(type, mp_app_mouse_event_cb, &did);
+    if (!handler) 
+        printf("Regi fail 1\n");
+
+    event = ecore_event_add(type, NULL, NULL, NULL);
+    if (!event)
+        printf("add fail\n");
+
+
+    mouse_down = ecore_event_handler_add(ECORE_EVENT_MOUSE_BUTTON_DOWN, mp_app_mouse_event_cb, NULL);
+    if (!mouse_down)
+        printf("Regi fail 2\n");
+
+    printf("%d %d\n", type, ECORE_EVENT_MOUSE_BUTTON_DOWN);
+
+    printf("main_loop_bengin()\n");
+    ecore_main_loop_begin();
+
+    ret = ecore_shutdown();
+    printf("unreached main_loop_bengin()\n");
 }
 
 bool init_vconf()
@@ -81,6 +125,8 @@ bool deinit_vconf()
     return res;
 }
 
+
+
 void initIPC(void)
 {
     pthread_attr_t attr;
@@ -106,7 +152,7 @@ int main(int argc, char *argv[])
     init_vconf();
 
     // Initialize Ecore
-    //initEcore();
+    initEcore();
 
 	// Start the main loop of service
 	g_main_loop_run(gMainLoop);
