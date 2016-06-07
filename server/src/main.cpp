@@ -59,7 +59,6 @@ Eina_Bool mp_app_mouse_event_cb(void *data, int type, void *event)
     else if (type == ECORE_EVENT_MOUSE_BUTTON_UP) {
         ALOGI("ECORE_EVENT_MOUSE_BUTTON_UP\n");
     }
-
     return 0;
 }
 
