@@ -33,22 +33,7 @@
 #undef LOG_TAG
 #define LOG_TAG "GROUP_PLAY_SVC"
 
-#define VCONFKEY_GROUP_PLAY  "db/private/org.tizen.menu-screen/group_play"
-#define MUSIC_PLAYER_PKG_NAME "org.tizen.music-player"
-
 static GMainLoop* gMainLoop = NULL;
-
-void _vconf_noti_callback(keynode_t *node, void* data)
-{
-    ALOGI("%s:+++\n", __func__);
-
-    char *keyname = vconf_keynode_get_name(node);
-
-    if (strcmp(keyname, VCONFKEY_GROUP_PLAY) == 0)
-    {
-        msg_send_func(PLAY_TIME_REQ);
-    }
-}
 
 Eina_Bool mp_app_mouse_event_cb(void *data, int type, void *event)
 {
@@ -103,38 +88,6 @@ bool initEcore()
     ALOGI("unreached main_loop_begin()\n");
 }
 
-bool init_vconf()
-{
-    bool res = TRUE;
-
-    ALOGI("%s:+++\n", __func__);
-
-    if (vconf_notify_key_changed(VCONFKEY_GROUP_PLAY, _vconf_noti_callback, NULL) < 0)
-    {
-            ALOGI("Error when register callback\n");
-            res = FALSE;
-    }
-
-    ALOGI("%s:---:res=%d\n", __func__, res);
-    
-    return res;
-}
-
-bool deinit_vconf()
-{
-    bool res = TRUE;
-        
-    ALOGI("%s:+++\n", __func__);
-                
-    //vconf_ignore_key_changed(VCONF_PLAYER_SHUFFLE, _vconf_noti_callback);
-                        
-    ALOGI("%s:---:res=%d\n", __func__, res);
-                                
-    return res;
-}
-
-
-
 void initIPC(void)
 {
     pthread_attr_t attr;
@@ -156,17 +109,12 @@ int main(int argc, char *argv[])
     // Initialize a udp communication
     initIPC();
 
-    // Initialize the vconf file
-    init_vconf();
-
     // Initialize Ecore
     initEcore();
 
 	// Start the main loop of service
 	g_main_loop_run(gMainLoop);
 
-    // Deinitializing vconf
-    deinit_vconf();
     ALOGI("Group Play Sevice terminated.");
 
 	return ret;

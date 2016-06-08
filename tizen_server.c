@@ -9,9 +9,10 @@
 #include <sys/wait.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <unistd.h>
 
 #define BUFSIZE 512
-#define MYPORT 8000
+#define MYPORT 10122
 #define MAXNAME 100 
 
 #define NTP_REQ 0x74160004
@@ -20,20 +21,21 @@
 
 struct stMsg{
 	unsigned int ulMsgId;
-	unsigned int Time;     // Reserved
-	//char        cName[MAX_FILE_NAME];
+	unsigned int Time;
 };
 
 int main(int argc,  char *argv[] )
 {
-	int	sd, numbytes,bytessent, ret, client_num=0,i;
-	struct	sockaddr_in
-		serveraddress,cliaddr[3];
+	int	sd, numbytes, bytessent, ret, client_num=0, i;
+	struct	sockaddr_in serveraddress, cliaddr[3];
 	socklen_t length;
-	char clientname[MAXNAME],datareceived[BUFSIZE];
+	char clientname[MAXNAME], datareceived[BUFSIZE];
+	time_t timer;
 
 	struct stMsg newstUdpMsg;
 	struct stMsg *stUdpMsg;
+
+	// Create a socket
 	sd = socket( AF_INET, SOCK_DGRAM, 0 );
 	if(0 > sd ) 
 	{
@@ -41,6 +43,7 @@ int main(int argc,  char *argv[] )
 		exit( 1 );
 	}
 	
+	// Initialize the server address
 	memset( &serveraddress, 0, sizeof(serveraddress) );
 	for(i=0;i<3;i++)
 	{
@@ -49,134 +52,101 @@ int main(int argc,  char *argv[] )
 	serveraddress.sin_family = AF_INET;
 	serveraddress.sin_port = htons(MYPORT);//PORT NO
 	serveraddress.sin_addr.s_addr = htonl(INADDR_ANY);//IP ADDRESS
-	ret=bind(sd,(struct sockaddr*)&serveraddress,sizeof(serveraddress));
+
+	// Bind
+	ret = bind(sd,(struct sockaddr*)&serveraddress,sizeof(serveraddress));
 	if(0 > ret)
 	{
 		perror("Bind Fails:");
 		exit(1);
 	}
+	printf("bind ok\n");
 
-	time_t timer;
+	printf("UDP Server:  Waiting for client data\n");
 
+	length = sizeof(cliaddr);
 
-//	while(1)
-//	{
-		printf("UDP Server:  Waiting for client data\n");
-		length=sizeof(cliaddr);
+	// Receive a datagram from client 0
+	numbytes = recvfrom(sd, datareceived, BUFSIZE, 0,
+							(struct sockaddr*)&cliaddr[0], &length);
+	printf("received datagram from client 0, numbytes = %d\n", numbytes);
+	if (0 > numbytes)
+	{
+		perror("Error while receiving:");
+		exit(1);
+	}
 
-		/*Received a datagram*/
-		numbytes = recvfrom(sd,datareceived,BUFSIZE,0,
-                                (struct sockaddr*)&cliaddr[0],&length);
+	stUdpMsg = (struct stMsg *) datareceived;
+	datareceived[numbytes] = '\0';
+	printf("MSG TYPE: %x\n", ntohl(stUdpMsg->ulMsgId));
 
-		if (0 > numbytes)
+	if(ntohl(stUdpMsg->ulMsgId) == INITIAL_CONNECT_REQ )
+	{
+		printf("Data Received from %s, %d\n",
+			inet_ntop(AF_INET,&cliaddr[client_num].sin_addr,
+				clientname,sizeof(clientname)), cliaddr[client_num].sin_port);
+		printf("client number : %d\n", client_num);
+		client_num++;
+	}
+	else
+	{
+		// error
+		printf("MSG TYPE ERROR\n");
+	}
+
+	// Receive a datagram from client 1
+	numbytes = recvfrom(sd, datareceived, BUFSIZE, 0,
+							(struct sockaddr*)&cliaddr[1], &length);
+	printf("received datagram from client 1, numbytes = %d\n", numbytes);
+	if (0 > numbytes)
+	{
+		perror("Error while receiving:");
+		exit(1);
+	}
+
+	stUdpMsg = (struct stMsg *) datareceived;
+	datareceived[numbytes] = '\0';
+	printf("MSG TYPE: %x\n", ntohl(stUdpMsg->ulMsgId));
+
+	if(ntohl(stUdpMsg->ulMsgId) == INITIAL_CONNECT_REQ )
+	{
+			printf("Data Received from %s, %d\n",
+					inet_ntop(AF_INET,&cliaddr[client_num].sin_addr,
+							clientname,sizeof(clientname)), cliaddr[client_num].sin_port);
+			printf("client number : %d\n", client_num);
+			client_num++;
+	}
+	else
+	{
+		// error
+		printf("MSG TYPE ERROR\n");		
+	}
+
+	printf("connection complete\n");
+	printf("sleep start\n");
+	usleep(20 * 1000 * 1000);
+	printf("sleep end\n");
+
+	// Send the response message to the clients
+	printf("Send the response to the clients..\n");
+
+	memset( &newstUdpMsg, 0, sizeof(newstUdpMsg) );
+	newstUdpMsg.ulMsgId = htonl(PLAY_TIME_REQ);
+	timer = time(NULL);
+	newstUdpMsg.Time = htonl(timer+3);
+
+	for(i=0;i<client_num;i++)
+	{
+		printf("client [%d], port = %d\n", i, cliaddr[i].sin_port);
+		bytessent = sendto(sd, &newstUdpMsg, sizeof(struct stMsg), 0, (struct sockaddr *)&cliaddr[i], length);
+		printf("bytessent = %d\n", bytessent);
+		if (bytessent < 0)
 		{
-			perror("Error while receiving:");
+			printf("sendto error\n");
 			exit(1);
 		}
+		printf("sendto complete %d\n", i);
+	}
 
-		//printf("datarevevied : %s\n",datareceived);
-		stUdpMsg = (struct stMsg *)datareceived;
-		//printf("stMsg.Msg : %d\n",stUdpMsg->ulMsgId);
-		datareceived[numbytes]='\0';
-
-		if(stUdpMsg->ulMsgId == NTP_REQ )
-		{
-			//시간 동기화 과정 
-		}
-		else if(stUdpMsg->ulMsgId == PLAY_TIME_REQ )
-		{
-			memset( &newstUdpMsg, 0, sizeof(newstUdpMsg) );
-
-			printf("debug PLAY_TIME_REQ\n");
-			newstUdpMsg.ulMsgId = PLAY_TIME_REQ;
-			timer = time(NULL);
-			newstUdpMsg.Time = timer+3;
-			for(i=0;i<client_num;i++)
-			{
-				printf("client [%d]\n",i);
-				bytessent = sendto(sd,&newstUdpMsg,sizeof(struct stMsg),0,(struct sockaddr *)&cliaddr[i],length);
-				if (0 > bytessent)
-				{
-					perror("Error while sending:");
-					exit(1);
-				}
-			}
-		}
-		else if(stUdpMsg->ulMsgId == INITIAL_CONNECT_REQ )
-		{
-			printf("Data Received from %s\n",
-				inet_ntop(AF_INET,&cliaddr[client_num].sin_addr,
-					clientname,sizeof(clientname)));
-			client_num++;
-			printf("client number : %d\n",client_num);
-		}
-		else
-		{
-			//error
-		}
-
-		numbytes = recvfrom(sd,datareceived,BUFSIZE,0,
-                                (struct sockaddr*)&cliaddr[1],&length);
-
-		if (0 > numbytes)
-                {
-                        perror("Error while receiving:");
-                        exit(1);
-                }
-
-		//printf("datarevevied : %s\n",datareceived);
-                stUdpMsg = (struct stMsg *)datareceived;
-                //printf("stMsg.Msg : %d\n",stUdpMsg->ulMsgId);
-                datareceived[numbytes]='\0';
-		
-		if(stUdpMsg->ulMsgId == INITIAL_CONNECT_REQ )
-                {
-                        printf("Data Received from %s\n",
-                                inet_ntop(AF_INET,&cliaddr[client_num].sin_addr,
-                                        clientname,sizeof(clientname)));
-                        client_num++;
-                        printf("client number : %d\n",client_num);
-                }
-
-	
-
-		numbytes = recvfrom(sd,datareceived,BUFSIZE,0,
-                                (struct sockaddr*)&cliaddr[0],&length);
-
-		if (0 > numbytes)
-                {
-                        perror("Error while receiving:");
-                        exit(1);
-                }
-		
-		 //printf("datarevevied : %s\n",datareceived);
-                stUdpMsg = (struct stMsg *)datareceived;
-                //printf("stMsg.Msg : %d\n",stUdpMsg->ulMsgId);
-                datareceived[numbytes]='\0';
-
-		
-		if(stUdpMsg->ulMsgId == PLAY_TIME_REQ )
-                {
-                        memset( &newstUdpMsg, 0, sizeof(newstUdpMsg) );
-
-                        printf("debug PLAY_TIME_REQ\n");
-                        newstUdpMsg.ulMsgId = PLAY_TIME_REQ;
-                        timer = time(NULL);
-                        newstUdpMsg.Time = timer+3;
-                        for(i=0;i<client_num;i++)
-                        {
-                                printf("client [%d]\n",i);
-                                bytessent = sendto(sd,&newstUdpMsg,sizeof(struct stMsg),0,(struct sockaddr *)&cliaddr[i],length);
-                                if (0 > bytessent)
-                                {
-                                        perror("Error while sending:");
-                                        exit(1);
-                                }
-                        }
-                }
-
-//	}
+	printf("end\n");
 }
-
-
-

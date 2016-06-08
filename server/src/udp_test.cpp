@@ -38,7 +38,10 @@ int socket_fd;
 
 static void playMusic()
 {
+    ALOGI("Play music...\n");
+
     service_h service;
+
     service_create(&service);
     service_set_operation(service, SERVICE_OPERATION_VIEW);
     service_set_package(service, SOUND_PLAYER_PKG_NAME);
@@ -61,7 +64,7 @@ int msg_send_func(unsigned int ulMsgId)
 
     strcpy(ip_addr, temp);
 
-    ALOGI("\n\r Dest Ip Addres is %s \n\r", ip_addr);
+    ALOGI("Dest Ip Addres is %s.\n", ip_addr);
 
     memset(&stSendBuf, 0x0, sizeof(stSendBuf));
 
@@ -131,6 +134,8 @@ void *udp_thread_start(void*)
        
         memset(RecvBuf, 0, sizeof(RecvBuf));
         nbyte = recvfrom(socket_fd, RecvBuf, MAXLINE , 0, (struct sockaddr *)&cliaddr, (socklen_t *)&addrlen);
+        ALOGI("nbyte = %d\n", nbyte);
+
         if(nbyte > 0)
         {
             stUdpMsg = (struct stMsg *)RecvBuf;
@@ -150,23 +155,29 @@ void *udp_thread_start(void*)
                 break;
 
                 case PLAY_TIME_REQ:
-                // stUdpMsg->Time 에 플레이 !  
-                time_t timer;
+                ALOGI("time = %d\n", ntohl(stUdpMsg->Time));
+                /*time_t timer;
                 while(1)
                 {
+                    
                     timer = time(NULL);
-                    if(stUdpMsg->Time == timer)
+                    if(ntohl(stUdpMsg->Time) == timer)
                     {
                         playMusic();
                         break;
                     }
-                }
+                }*/
+                playMusic();
                
                 break;
 
                 default :
                 break;
             }
+        }
+        else
+        {
+            ALOGI("Receive Error! errno = %d, %s\n", errno, strerror(errno));
         }
 
 

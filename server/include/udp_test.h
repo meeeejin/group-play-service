@@ -4,7 +4,7 @@
 
 struct stMsg{
    unsigned int ulMsgId;
-   unsigned int Time;     // Reserved
+   unsigned int Time;
 };
 
 int msg_send_func(unsigned int ulMsgId);
