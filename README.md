@@ -1,6 +1,9 @@
 # Group Play Service
 Group play service for Tizen (SKKU Tizen Project)
 
+## Project Details
+[Powerpoint slide on SlideShare](http://www.slideshare.net/meeeejin/group-play-service-for-tizen)
+
 ## Prerequisites
 
 1. GBS configuration (~/.gbs.conf)
